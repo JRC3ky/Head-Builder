@@ -9,7 +9,7 @@ import {
   RotateCcw, 
   ZoomIn,
   Camera,
-  Mesh,
+  Box,
   Image,
   Settings2,
   Target,
