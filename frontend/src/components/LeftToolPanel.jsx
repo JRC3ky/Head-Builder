@@ -71,7 +71,7 @@ const LeftToolPanel = ({ selectedTool, setSelectedTool, activeModel, referencePh
                 Create Head
               </Button>
               <Button variant="ghost" size="sm" className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-700">
-                <Mesh className="w-4 h-4 mr-2" />
+                <Box className="w-4 h-4 mr-2" />
                 Refine Mesh
               </Button>
               <Button variant="ghost" size="sm" className="w-full justify-start text-gray-300 hover:text-white hover:bg-gray-700">
