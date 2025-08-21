@@ -1,34 +1,149 @@
-.App-logo {
-    height: 40vmin;
-    pointer-events: none;
+/* Custom styles for FaceBuilder */
+.App {
+  background-color: #111827;
+  min-height: 100vh;
+  overflow: hidden;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-    .App-logo {
-        animation: App-logo-spin infinite 20s linear;
-    }
+/* Custom scrollbar for dark theme */
+::-webkit-scrollbar {
+  width: 8px;
 }
 
-.App-header {
-    background-color: #0f0f10;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    font-size: calc(10px + 2vmin);
-    color: white;
+::-webkit-scrollbar-track {
+  background: #374151;
 }
 
-.App-link {
-    color: #61dafb;
+::-webkit-scrollbar-thumb {
+  background: #6b7280;
+  border-radius: 4px;
 }
 
-@keyframes App-logo-spin {
-    from {
-        transform: rotate(0deg);
-    }
-    to {
-        transform: rotate(360deg);
-    }
+::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+/* Canvas cursor styles */
+.viewport-canvas {
+  cursor: grab;
+}
+
+.viewport-canvas:active {
+  cursor: grabbing;
+}
+
+/* Selection indicators */
+.tool-selected {
+  background-color: #2563eb !important;
+  color: white !important;
+}
+
+/* Photo overlay styles */
+.photo-overlay {
+  border: 2px dashed #3b82f6;
+  background: rgba(59, 130, 246, 0.1);
+}
+
+/* Animate panel transitions */
+.panel-transition {
+  transition: all 0.2s ease-in-out;
+}
+
+/* 3D Transform styles */
+.viewport-3d {
+  transform-style: preserve-3d;
+  perspective: 1000px;
+}
+
+/* Loading indicators */
+.loading-spinner {
+  border: 2px solid #374151;
+  border-top: 2px solid #3b82f6;
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hover effects */
+.hover-glow:hover {
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+}
+
+/* Status indicators */
+.status-ready {
+  color: #10b981;
+}
+
+.status-processing {
+  color: #f59e0b;
+}
+
+.status-error {
+  color: #ef4444;
+}
+
+/* Grid overlay */
+.grid-overlay {
+  background-image: 
+    linear-gradient(rgba(107, 114, 128, 0.2) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(107, 114, 128, 0.2) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Tool panel styles */
+.tool-panel {
+  background: linear-gradient(145deg, #1f2937, #111827);
+}
+
+.properties-panel {
+  background: linear-gradient(145deg, #1f2937, #111827);
+}
+
+/* Viewport styles */
+.viewport-area {
+  background: radial-gradient(circle at center, #1f2937, #111827);
+}
+
+/* Professional button styles */
+.btn-primary {
+  background: linear-gradient(135deg, #3b82f6, #1e40af);
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Text selection styles */
+::selection {
+  background: rgba(59, 130, 246, 0.3);
+}
+
+/* Focus styles */
+.focus-ring:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+/* Responsive adjustments */
+@media (max-width: 1024px) {
+  .tool-panel,
+  .properties-panel {
+    width: 280px;
+  }
+}
+
+@media (max-width: 768px) {
+  .tool-panel,
+  .properties-panel {
+    width: 250px;
+  }
 }
