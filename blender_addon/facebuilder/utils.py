@@ -5,36 +5,44 @@ FaceBuilder Utilities - Helper functions for mesh manipulation
 import bpy
 import bmesh
 from mathutils import Vector
-import numpy as np
 
 def update_face_parameters(obj, facebuilder_props):
     """Update face mesh based on current parameters"""
     if not obj or obj.type != 'MESH':
         return
     
-    # Enter edit mode
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.mode_set(mode='EDIT')
+    # Store current mode
+    current_mode = bpy.context.object.mode if bpy.context.object else 'OBJECT'
     
-    # Get bmesh representation
-    bm = bmesh.from_mesh(obj.data)
-    bm.faces.ensure_lookup_table()
-    bm.verts.ensure_lookup_table()
-    
-    # Apply face parameters to vertices
-    apply_face_width(bm, facebuilder_props.face_width)
-    apply_face_height(bm, facebuilder_props.face_height)
-    apply_eye_distance(bm, facebuilder_props.eye_distance)
-    apply_nose_height(bm, facebuilder_props.nose_height)
-    apply_mouth_width(bm, facebuilder_props.mouth_width)
-    apply_chin_height(bm, facebuilder_props.chin_height)
-    
-    # Update mesh
-    bmesh.update_edit_mesh(obj.data)
-    bm.free()
-    
-    # Return to object mode
-    bpy.ops.object.mode_set(mode='OBJECT')
+    try:
+        # Ensure object is active and in edit mode
+        bpy.context.view_layer.objects.active = obj
+        if current_mode != 'EDIT':
+            bpy.ops.object.mode_set(mode='EDIT')
+        
+        # Get bmesh representation
+        bm = bmesh.from_mesh(obj.data)
+        bm.faces.ensure_lookup_table()
+        bm.verts.ensure_lookup_table()
+        
+        # Apply face parameters to vertices
+        apply_face_width(bm, facebuilder_props.face_width)
+        apply_face_height(bm, facebuilder_props.face_height)
+        apply_eye_distance(bm, facebuilder_props.eye_distance)
+        apply_nose_height(bm, facebuilder_props.nose_height)
+        apply_mouth_width(bm, facebuilder_props.mouth_width)
+        apply_chin_height(bm, facebuilder_props.chin_height)
+        
+        # Update mesh
+        bmesh.update_edit_mesh(obj.data)
+        bm.free()
+        
+    except Exception as e:
+        print(f"Error updating face parameters: {e}")
+    finally:
+        # Return to original mode
+        if bpy.context.object and bpy.context.object.mode != current_mode:
+            bpy.ops.object.mode_set(mode=current_mode)
 
 def apply_face_width(bm, width_factor):
     """Apply face width parameter to mesh"""
@@ -120,21 +128,30 @@ def generate_uv_layout(obj):
     if not obj or obj.type != 'MESH':
         return
     
-    # Select object and enter edit mode
-    bpy.context.view_layer.objects.active = obj
-    bpy.ops.object.mode_set(mode='EDIT')
+    # Store current mode
+    current_mode = bpy.context.object.mode if bpy.context.object else 'OBJECT'
     
-    # Select all faces
-    bpy.ops.mesh.select_all(action='SELECT')
-    
-    # Mark seams for face (simplified)
-    bpy.ops.mesh.mark_seam(clear=False)
-    
-    # Unwrap UV
-    bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
-    
-    # Return to object mode
-    bpy.ops.object.mode_set(mode='OBJECT')
+    try:
+        # Select object and enter edit mode
+        bpy.context.view_layer.objects.active = obj
+        if current_mode != 'EDIT':
+            bpy.ops.object.mode_set(mode='EDIT')
+        
+        # Select all faces
+        bpy.ops.mesh.select_all(action='SELECT')
+        
+        # Mark seams for face (simplified)
+        bpy.ops.mesh.mark_seam(clear=False)
+        
+        # Unwrap UV
+        bpy.ops.uv.unwrap(method='ANGLE_BASED', margin=0.001)
+        
+    except Exception as e:
+        print(f"Error generating UV layout: {e}")
+    finally:
+        # Return to original mode
+        if bpy.context.object and bpy.context.object.mode != current_mode:
+            bpy.ops.object.mode_set(mode=current_mode)
 
 def create_skin_material():
     """Create a realistic skin material"""

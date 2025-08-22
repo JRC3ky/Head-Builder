@@ -28,19 +28,9 @@ class FACEBUILDER_OT_create_head(Operator):
         
         # Create basic head geometry
         bm = bmesh.new()
-        bmesh.ops.create_uvsphere(bm, u_segments=32, v_segments=16, radius=1.0)
         
-        # Modify to head shape
-        for vert in bm.verts:
-            # Flatten bottom (neck area)
-            if vert.co.z < -0.5:
-                vert.co.z *= 0.3
-            # Elongate face
-            vert.co.z *= 1.3
-            # Narrow top (skull)
-            if vert.co.z > 0.3:
-                vert.co.x *= 0.8
-                vert.co.y *= 0.8
+        # Create a proper head-shaped mesh instead of a sphere
+        self.create_head_mesh(bm)
         
         bm.to_mesh(mesh)
         bm.free()
@@ -92,6 +82,77 @@ class FACEBUILDER_OT_create_head(Operator):
         
         # Assign material
         obj.data.materials.append(mat)
+    
+    def create_head_mesh(self, bm):
+        """Create a proper anatomical head mesh"""
+        # Create a cylinder as base and modify it to head shape
+        bmesh.ops.create_cylinder(
+            bm,
+            cap_ends=True,
+            radius=0.8,
+            depth=2.4,
+            segments=24
+        )
+        
+        # Transform and shape into head
+        for vert in bm.verts:
+            x, y, z = vert.co.x, vert.co.y, vert.co.z
+            
+            # Create head profile - narrower at top and bottom
+            height_factor = (z + 1.2) / 2.4  # Normalize height 0-1
+            
+            # Head width profile - wider in middle (temples), narrower at top and chin
+            if height_factor > 0.7:  # Top of head (skull)
+                width_scale = 0.6 + (1.0 - height_factor) * 0.8
+            elif height_factor > 0.4:  # Face area
+                width_scale = 0.9 + (height_factor - 0.4) * 0.3
+            else:  # Chin/neck area
+                width_scale = 0.5 + height_factor * 0.8
+                
+            # Apply width scaling
+            vert.co.x *= width_scale
+            vert.co.y *= width_scale
+            
+            # Create face profile - push forward in face area
+            if 0.2 < height_factor < 0.8:
+                # Face should protrude forward
+                face_factor = 1.0 - abs(height_factor - 0.5) * 2  # Peak at middle
+                if face_factor > 0:
+                    # Push forward more at center, less at edges
+                    center_distance = 1.0 - (x*x + y*y)**0.5 / 0.8
+                    if center_distance > 0:
+                        forward_push = face_factor * center_distance * 0.3
+                        vert.co.y += forward_push
+            
+            # Create chin depression
+            if height_factor < 0.3:
+                chin_factor = (0.3 - height_factor) / 0.3
+                center_distance = 1.0 - (x*x)**0.5 / 0.3
+                if center_distance > 0 and abs(x) < 0.3:
+                    vert.co.y -= chin_factor * center_distance * 0.1
+                    
+            # Create eye socket area (slight indentation)
+            if 0.5 < height_factor < 0.7:
+                eye_distance = ((abs(x) - 0.25)**2 + (y - 0.7)**2)**0.5
+                if eye_distance < 0.2:
+                    socket_depth = (0.2 - eye_distance) / 0.2 * 0.08
+                    vert.co.y -= socket_depth
+            
+            # Adjust overall proportions
+            vert.co.z *= 0.9  # Slightly compress height
+            
+        # Smooth the mesh
+        bmesh.ops.smooth_vert(
+            bm,
+            verts=bm.verts,
+            factor=0.5,
+            mirror_clip_x=False,
+            mirror_clip_y=False,
+            mirror_clip_z=False,
+            use_axis_x=True,
+            use_axis_y=True,
+            use_axis_z=True
+        )
 
 class FACEBUILDER_OT_load_photo(Operator, ImportHelper):
     """Load reference photo for face modeling"""
